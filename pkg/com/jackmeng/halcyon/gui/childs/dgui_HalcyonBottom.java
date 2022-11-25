@@ -1,11 +1,12 @@
 package com.jackmeng.halcyon.gui.childs;
 
-import com.jackmeng.halcyon.const_Global;
+import com.jackmeng.const_Global;
 import com.jackmeng.halcyon.const_MUTableKeys;
-import com.jackmeng.halcyon.use_HalcyonProperties;
-import com.jackmeng.halcyon.apps.evnt_RemoveTab;
-import com.jackmeng.halcyon.apps.evnt_SelectPlaylistTrack;
-import com.jackmeng.halcyon.apps.impl_HalcyonRefreshable;
+import com.jackmeng.halcyon.use_Halcyon;
+import com.jackmeng.halcyon.abst.evnt_RemoveTab;
+import com.jackmeng.halcyon.abst.evnt_SelectPlaylistTrack;
+import com.jackmeng.halcyon.abst.impl_Guard;
+import com.jackmeng.halcyon.abst.impl_HalcyonRefreshable;
 import com.jackmeng.halcyon.gui.const_ColorManager;
 import com.jackmeng.halcyon.gui.const_Manager;
 import com.jackmeng.halcyon.gui.const_ResourceManager;
@@ -13,6 +14,7 @@ import com.jackmeng.sys.pstream;
 import com.jackmeng.sys.use_Task;
 import com.jackmeng.tailwind.use_TailwindPlaylist;
 import com.jackmeng.tailwind.use_TailwindTrack;
+import com.jackmeng.util.use_Commons;
 import com.jackmeng.util.use_Image;
 import com.jackmeng.util.use_ResourceFetcher;
 import com.jackmeng.util.use_Struct.*;
@@ -141,7 +143,6 @@ public class dgui_HalcyonBottom
       }
     }
 
-
     public dgui_HalcyonFileList()
     {
       setPreferredSize(new Dimension(const_Manager.FRAME_MIN_WIDTH - const_Manager.DGUI_APPS_WIDTH,
@@ -159,13 +160,13 @@ public class dgui_HalcyonBottom
       pane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
       pane.setFocusable(false);
       pane.setOpaque(true);
-      pane.setFont(use_HalcyonProperties.regularFont().deriveFont(const_Manager.PROGRAM_DEFAULT_FONT_SIZE));
+      pane.setFont(use_Halcyon.regularFont().deriveFont(const_Manager.PROGRAM_DEFAULT_FONT_SIZE));
 
       if (const_MUTableKeys.use_filelist_titled_border)
       {
         border = BorderFactory.createTitledBorder(_lang(LANG_FILELIST_BORDER_TITLE));
         border.setBorder(BorderFactory.createEmptyBorder());
-        border.setTitleFont(use_HalcyonProperties.boldFont().deriveFont(15F));
+        border.setTitleFont(use_Halcyon.boldFont().deriveFont(15F));
         setBorder(border);
         pane.addChangeListener(x -> {
           JTabbedPane t = (JTabbedPane) x.getSource();
@@ -191,6 +192,27 @@ public class dgui_HalcyonBottom
       / this should be at bottom to avoid NULLABLE swing components being called!! /
       /---------------------------------------------------------------------------*/
       const_Global.PLAY_LIST_POOL.addRefreshable(this);
+
+      const_Global.PLAY_LIST_POOL.setGuard(new impl_Guard< use_TailwindPlaylist >() {
+        @Override
+        public boolean check(use_TailwindPlaylist e)
+        {
+          if (const_Global.PLAY_LIST_POOL.hasObj(e))
+          {
+            pstream.log.warn("I HAVE THIS PLAYLIST ADDED!!!");
+            for (int i = 0; i < pane.getTabCount(); i++)
+            {
+              if (pane.getTabComponentAt(i).getName().equals(e.id()))
+              {
+                pane.setSelectedIndex(i);
+              }
+            }
+            return false;
+          }
+          pstream.log.warn("I DONT HAVE THIS PLAYLIST ADDED");
+          return true;
+        }
+      });
 
       /*-----------------------------------
       ----------------------------------------------------------- /
@@ -286,7 +308,7 @@ public class dgui_HalcyonBottom
               DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
               if (node.getParent() != null && !node.getParent().toString().equals(tree.getParent().toString()))
               {
-                File f = new File(tree.getName() + use_HalcyonProperties.getFileSeparator() + node);
+                File f = new File(tree.getName() + use_Halcyon.getFileSeparator() + node);
                 if (last == null)
                   last = f;
 
@@ -308,7 +330,7 @@ public class dgui_HalcyonBottom
       jsp.setName(list.getParent());
       jsp.getViewport().add(tree);
 
-      pane.add(list.getCanonicalParent_1(), jsp);
+      pane.addTab(use_Commons.strong_delimiter(list.getCanonicalParent_1(), "...", 2), jsp);
       if (list.expose_traits().closeable)
       {
         filelist_TabButtons buttons = new filelist_TabButtons(list.getCanonicalParent_1(), () -> {
@@ -318,6 +340,7 @@ public class dgui_HalcyonBottom
         pane.setTabComponentAt(pane.getTabCount() - 1, buttons);
       }
       pane.setToolTipTextAt(pane.getTabCount() - 1, list.getParent());
+      pane.getTabComponentAt(pane.getTabCount() - 1).setName(list.getParent());
       guiTrees.put(list.id(),
           new struct_Trio<>(
               new struct_Pair<>(pane.getTabCount() - 1, tree), root, nodes));

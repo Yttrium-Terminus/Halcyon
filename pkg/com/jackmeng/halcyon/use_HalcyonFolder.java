@@ -6,16 +6,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 
+import com.jackmeng.const_Global;
+import com.jackmeng.halcyon.abst.impl_ForYou;
 import com.jackmeng.sys.pstream;
+import com.jackmeng.sys.use_FSys;
 import com.jackmeng.sys.use_Program;
 import com.jackmeng.tailwind.use_TailwindPlaylist;
 import com.jackmeng.tailwind.use_TailwindTrack;
-import com.jackmeng.util.use_Primitives;
+import com.jackmeng.util.use_Commons;
 
 public final class use_HalcyonFolder
 {
@@ -39,13 +43,13 @@ public final class use_HalcyonFolder
     /--------------------------------------------------------------*/
     CACHE_d("caches"), USER_d("conf"), SHARED_LIBRARY_d("hlib"), PLOOGINS_d("extern"), LOGS_d("logs"), SYSCONF_f(
         "HALCYON.hal"), LANG_CONF_f("_locale.hal"), MASTADIR_d(
-            ""), PLAYLISTS_CONF_f("conf" + use_HalcyonProperties.getFileSeparator() + "personal.hal");
+            ""), PLAYLISTS_CONF_f("conf" + use_Halcyon.getFileSeparator() + "personal.hal");
 
     public final String val;
 
     private halcyonfolder_Content(String name)
     {
-      this.val = MASTA_FOLDA + use_HalcyonProperties.getFileSeparator() + name;
+      this.val = MASTA_FOLDA + use_Halcyon.getFileSeparator() + name;
     }
 
     public File make()
@@ -95,7 +99,7 @@ public final class use_HalcyonFolder
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
 
     m_w_f(
-        new File(halcyonfolder_Content.LOGS_d.val + use_HalcyonProperties.getFileSeparator() + "LOG_"
+        new File(halcyonfolder_Content.LOGS_d.val + use_Halcyon.getFileSeparator() + "LOG_"
             + new SimpleDateFormat("yyy-MM-dd_HH_mm_ss").format(d) + ".log"),
         "Halcyon/MP4J - LOG EXCEPTION,LOGGED TELEMETRY DATA\nException caught time: " + df.format(d)
             + "\n"
@@ -115,7 +119,7 @@ public final class use_HalcyonFolder
     /*------------------------------------ /
     / pulls everything from MutableManager /
     /-------------------------------------*/
-    for (use_MUTableDefinition e : use_HalcyonProperties.DEFS)
+    for (use_MUTableDefinition e : use_Halcyon.DEFS)
       p.put(e.key, e.get() == null || e.get().isEmpty() ? e.defaultVal : e.get());
     try
     {
@@ -139,7 +143,7 @@ public final class use_HalcyonFolder
       log(e);
     }
     for (Object r : p.keySet())
-      for (use_MUTableDefinition er : use_HalcyonProperties.DEFS)
+      for (use_MUTableDefinition er : use_Halcyon.DEFS)
         if (er.key.equals(r))
           er.validate((String) p.get(er.key));
   }
@@ -159,7 +163,7 @@ public final class use_HalcyonFolder
 
   public void log(Exception ex)
   {
-    log(use_Primitives.expand_exception(ex));
+    log(use_Commons.expand_exception(ex));
   }
 
   public void check(halcyonfolder_Content e)
@@ -186,6 +190,19 @@ public final class use_HalcyonFolder
     }
     else
       pstream.log.warn("UNRECOGNIZED FOLDER_CONTENT_ENUM_NAME: " + e.name());
+  }
+
+  public void serialize(String completeFilename, Serializable e)
+  {
+    use_FSys.serialize_OBJ(halcyonfolder_Content.CACHE_d.val + use_Halcyon.getFileSeparator() + completeFilename, e,
+        this::log);
+  }
+
+  public < T > void deserialize(String completeFileName, Class< T > t, impl_ForYou< Exception > error,
+      impl_ForYou< T > promise)
+  {
+    use_FSys.deserialize_OBJ(halcyonfolder_Content.CACHE_d.val + use_Halcyon.getFileSeparator() + completeFileName, t,
+        error, promise);
   }
 
   public void save_playlists()
@@ -260,6 +277,7 @@ public final class use_HalcyonFolder
       }
     }
   }
+
   public void check()
   {
     if (!locale.isDirectory() || !locale.exists())

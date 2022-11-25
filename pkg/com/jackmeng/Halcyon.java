@@ -3,10 +3,9 @@ package com.jackmeng;
 import com.jackmeng.halcyon.gui.gui_HalcyonFrame;
 import com.jackmeng.halcyon.gui.childs.dgui_HalcyonBottom;
 import com.jackmeng.halcyon.gui.childs.dgui_HalcyonTop;
-import com.jackmeng.halcyon.const_Global;
 import com.jackmeng.halcyon.const_MUTableKeys;
 import com.jackmeng.halcyon.use_HalcyonFolder;
-import com.jackmeng.halcyon.use_HalcyonProperties;
+import com.jackmeng.halcyon.use_Halcyon;
 import com.jackmeng.sys.*;
 import com.test.Test;
 
@@ -23,7 +22,6 @@ public final class Halcyon
    static {
       System.setProperty("sun.java2d.noddraw", "true");
       System.setProperty("sun.java2d.d3d", "false");
-      System.setProperty("sun.java2d.opengl", "true");
    }
 
    public static void __LINK__()
@@ -78,7 +76,7 @@ public final class Halcyon
          final long time = System.currentTimeMillis();
          try
          {
-            use_HalcyonProperties.init_properties();
+            use_Halcyon.init_properties();
          } catch (Exception e)
          {
             pstream.log.err(e);

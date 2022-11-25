@@ -1,11 +1,26 @@
 package com.jackmeng.util;
 
-import com.jackmeng.halcyon.apps.impl_ForYou;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.jackmeng.halcyon.abst.impl_ForYou;
 
 public final class use_Struct
 {
   private use_Struct()
   {
+  }
+
+  public static final class struct_Node< T >
+  {
+    public Object key;
+    public List< struct_Node< ? > > partners;
+
+    public struct_Node(T i)
+    {
+      key = i;
+      partners = new ArrayList<>();
+    }
   }
 
   /*------------------------------------------------------------ /
@@ -105,8 +120,8 @@ public final class use_Struct
 
     public Object[] to_array()
     {
-      return use_Primitives.is_generic(first.getClass()) || use_Primitives.is_generic(second.getClass())
-          || use_Primitives.is_generic(third.getClass()) ? null : new Object[] { first, second, third };
+      return use_Commons.is_generic(first.getClass()) || use_Commons.is_generic(second.getClass())
+          || use_Commons.is_generic(third.getClass()) ? null : new Object[] { first, second, third };
     }
 
     @Override

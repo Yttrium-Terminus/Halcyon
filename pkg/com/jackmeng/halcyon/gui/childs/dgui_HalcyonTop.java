@@ -2,10 +2,11 @@ package com.jackmeng.halcyon.gui.childs;
 
 import javax.swing.*;
 import java.awt.*;
-import com.jackmeng.halcyon.const_Global;
+
+import com.jackmeng.const_Global;
 import com.jackmeng.halcyon.const_MUTableKeys;
-import com.jackmeng.halcyon.use_HalcyonProperties;
-import com.jackmeng.halcyon.apps.evnt_SelectPlaylistTrack;
+import com.jackmeng.halcyon.use_Halcyon;
+import com.jackmeng.halcyon.abst.evnt_SelectPlaylistTrack;
 import com.jackmeng.halcyon.gui.const_ColorManager;
 import com.jackmeng.halcyon.gui.const_Manager;
 import com.jackmeng.halcyon.gui.const_ResourceManager;
@@ -13,7 +14,6 @@ import com.jackmeng.sys.use_Chronos;
 import com.jackmeng.tailwind.use_TailwindTrack;
 import com.jackmeng.tailwind.use_TailwindTrack.tailwindtrack_Tags;
 import com.jackmeng.util.use_Color;
-import com.jackmeng.util.use_Image;
 import com.jackmeng.util.use_ResourceFetcher;
 import com.jackmeng.util.use_Struct.struct_Pair;
 
@@ -32,13 +32,13 @@ public class dgui_HalcyonTop
     {
       private transient BufferedImage img;
       private boolean retain;
-      private int width, height;
+      private int x_width, x_height;
 
       public halcyonTop_Info_Artworklabel(boolean retainOnNull, struct_Pair< Integer, Integer > resizeSize)
       {
         this.retain = retainOnNull;
-        this.width = Math.abs(resizeSize.first);
-        this.height = Math.abs(resizeSize.second);
+        this.x_width = Math.abs(resizeSize.first);
+        this.x_height = Math.abs(resizeSize.second);
       }
 
       public void setIMG(BufferedImage i)
@@ -56,7 +56,7 @@ public class dgui_HalcyonTop
           g2.drawImage((img.getWidth() > img.getHeight()
               ? img.getSubimage(img.getWidth() / 2 - img.getHeight() / 2, 0, img.getHeight(), img.getHeight())
               : img.getSubimage(0, img.getHeight() / 2 - img.getWidth() / 2, img.getWidth(), img.getWidth()))
-                  .getScaledInstance(const_MUTableKeys.top_artwork_wxh.first, const_MUTableKeys.top_artwork_wxh.second,
+                  .getScaledInstance(x_width, x_height,
                       Image.SCALE_SMOOTH),
               null, null);
           g2.dispose();
@@ -84,34 +84,37 @@ public class dgui_HalcyonTop
       infoDisplayer.setPreferredSize(new Dimension());
 
       mainTitle = new JLabel((String) tailwindtrack_Tags.MEDIA_TITLE.value);
-      mainTitle.setFont(use_HalcyonProperties.boldFont().deriveFont(22F));
+      mainTitle.setFont(use_Halcyon.boldFont().deriveFont(22F));
       mainTitle.setForeground(const_ColorManager.DEFAULT_GREEN_FG);
       mainTitle.setAlignmentY(Component.CENTER_ALIGNMENT);
+      mainTitle.setOpaque(false);
 
       miscTitle = new JLabel((String) tailwindtrack_Tags.MEDIA_ARTIST.value);
-      miscTitle.setFont(use_HalcyonProperties.regularFont().deriveFont(14.5F));
+      miscTitle.setFont(use_Halcyon.regularFont().deriveFont(14.5F));
       miscTitle.setForeground(Color.WHITE);
       miscTitle.setAlignmentY(Component.CENTER_ALIGNMENT);
+      miscTitle.setOpaque(false);
 
       otherTitle = new JLabel("0kpbs | 0kHz | 00:00:00");
-      otherTitle.setFont(use_HalcyonProperties.regularFont().deriveFont(12F));
+      otherTitle.setFont(use_Halcyon.regularFont().deriveFont(12F));
       otherTitle.setForeground(const_ColorManager.DEFAULT_GRAY_FG);
       otherTitle.setAlignmentY(Component.CENTER_ALIGNMENT);
+      otherTitle.setOpaque(false);
 
       infoDisplayer.add(mainTitle);
       infoDisplayer.add(miscTitle);
       infoDisplayer.add(otherTitle);
+      infoDisplayer.setOpaque(false);
 
       artwork = new halcyonTop_Info_Artworklabel(false, const_MUTableKeys.top_artwork_wxh);
       artwork.setIMG((BufferedImage) tailwindtrack_Tags.MEDIA_ART.value);
+      artwork.setOpaque(false);
 
       add(artwork);
       add(infoDisplayer);
 
-      /*-------------------------------------------------- /
-      / setOpaque(true);                                   /
-      / setBackground(const_ColorManager.DEFAULT_BLUE_FG); /
-      /---------------------------------------------------*/
+      setOpaque(true);
+      setBackground(const_ColorManager.DEFAULT_BLUE_FG);
 
       const_Global.SELECTION_LISTENERS.add_listener(this);
     }

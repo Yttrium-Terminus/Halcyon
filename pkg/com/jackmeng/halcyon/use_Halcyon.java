@@ -1,12 +1,14 @@
 package com.jackmeng.halcyon;
 
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatAtomOneDarkIJTheme;
+import com.jackmeng.const_Global;
 import com.jackmeng.halcyon.gui.const_ColorManager;
 import com.jackmeng.halcyon.gui.const_ResourceManager;
 import com.jackmeng.util.use_Color;
 import com.jackmeng.util.use_ResourceFetcher;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
@@ -19,9 +21,9 @@ import java.util.ResourceBundle;
 import java.util.TimerTask;
 import java.util.logging.LogManager;
 
-public final class use_HalcyonProperties
+public final class use_Halcyon
 {
-  private use_HalcyonProperties()
+  private use_Halcyon()
   {
   }
 
@@ -65,7 +67,12 @@ public final class use_HalcyonProperties
             const_MUTableKeys.top_artwork_wxh.second = Integer.parseInt(x.toLowerCase().split("x")[1]);
           }, x -> {
             return const_MUTableKeys.top_artwork_wxh.first + "x" + const_MUTableKeys.top_artwork_wxh.second;
-          })
+          }),
+      new use_MUTableDefinition("Turn on debugging layouts for the GUI", "halcyon.gui.debug_layout", "no",
+          new String[] { "yes", "no" },
+          x -> const_MUTableKeys.gui_use_debug = !x.equalsIgnoreCase("no"), x -> {
+            return const_MUTableKeys.gui_use_debug ? "yes" : "no";
+          }),
   };
 
   public static final Random rng = new Random();
@@ -78,6 +85,11 @@ public final class use_HalcyonProperties
   public static String getFileSeparator()
   {
     return System.getProperty("file.separator") == null ? "/" : System.getProperty("file.separator");
+  }
+
+  public static Border getDebugBorder()
+  {
+    return BorderFactory.createLineBorder(use_Color.rndColor(), 2);
   }
 
   /**
